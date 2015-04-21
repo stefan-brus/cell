@@ -14,7 +14,7 @@
 
 void echo(FILE* f)
 {
-    int c;
+    int c = 0;
 
     check(f, "Can't cat unopened file.");
 

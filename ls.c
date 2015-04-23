@@ -3,7 +3,6 @@
  *
  * TODO:
  *      - Add options
- *      - Sort output better, ignore case
  *      - Handle path argument
  */
 
@@ -11,6 +10,7 @@
 #include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <strings.h>
 #include <unistd.h>
 
 /**
@@ -59,13 +59,36 @@ error:
     return 0;
 }
 
+/**
+ * Compare two entries, passed to scandir's compare argument
+ * Uses case-insensitive string comparison
+ *
+ * ARGS:
+ *      e1 = The first entry
+ *      e2 = The second entry
+ *
+ * RETURNS:
+ *      compare result
+ */
+
+int sort_nocase(const struct dirent** e1, const struct dirent** e2)
+{
+    check(e1 && *e1, "First compare entry is null");
+    check(e2 && *e2, "Second compare entry is null");
+
+    return strcasecmp((*e1)->d_name, (*e2)->d_name);
+
+error:
+    return 0;
+}
+
 int main(int argc, char* argv[])
 {
     struct dirent** entries = NULL;
     int rc = 0;
     int i = 0;
 
-    rc = scandir(DEFAULT_PATH, &entries, filter_dot, alphasort);
+    rc = scandir(DEFAULT_PATH, &entries, filter_dot, sort_nocase);
     check(rc >= 0, "Unable to open directory: %s", DEFAULT_PATH);
 
     for(i = 0; i < rc; i++)

@@ -2,12 +2,12 @@
  * ls command
  *
  * TODO:
- *      - Add options
  *      - Handle path argument
  */
 
 #include "dbg.h"
 #include <dirent.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
@@ -82,13 +82,47 @@ error:
     return 0;
 }
 
+/**
+ * Read the command line options from argv
+ * Write command line options into the output arguments
+ *
+ * Args:
+ *      argc = argument count
+ *      argv = argument vector
+ *      a = output, whether or not 'a' was set
+ *
+ * TODO: Generalize and make this a vararg function
+ */
+
+void read_opts(int argc, char* argv[], bool* a)
+{
+    int opt = 0;
+
+    while((opt = getopt(argc, argv, "a")) != -1)
+    {
+        switch(opt)
+        {
+            case 'a':
+                *a = true;
+                break;
+            default:
+                break;
+        }
+    }
+}
+
 int main(int argc, char* argv[])
 {
     struct dirent** entries = NULL;
+    int (*filter_fn)(const struct dirent*) = NULL;
     int rc = 0;
     int i = 0;
+    bool a = false;
 
-    rc = scandir(DEFAULT_PATH, &entries, filter_dot, sort_nocase);
+    read_opts(argc, argv, &a);
+    filter_fn = a ? NULL : filter_dot;
+
+    rc = scandir(DEFAULT_PATH, &entries, filter_fn, sort_nocase);
     check(rc >= 0, "Unable to open directory: %s", DEFAULT_PATH);
 
     for(i = 0; i < rc; i++)

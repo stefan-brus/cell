@@ -93,9 +93,10 @@ int main(int argc, char* argv[])
 
     for(i = 0; i < rc; i++)
     {
-        printf("%s\n", entries[i]->d_name);
+        printf("%s  ", entries[i]->d_name);
     }
 
+    printf("\n");
     free_entries(rc, entries);
 
     return 0;

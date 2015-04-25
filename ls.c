@@ -2,7 +2,7 @@
  * ls command
  *
  * TODO:
- *      - Handle path argument
+ *      - Format output better
  */
 
 #include "dbg.h"
@@ -37,6 +37,32 @@ void free_entries(int count, struct dirent** entries)
     }
 
     free(entries);
+}
+
+/**
+ * Print the given entries
+ *
+ * Args:
+ *      count = The number of entries
+ *      entries = The entries
+ */
+
+void print_entries(int count, struct dirent** entries)
+{
+    int i = 0;
+
+    check(entries, "Entries are null");
+    check(count >= 0, "No entries to print");
+
+    for(i = 0; i < count; i++)
+    {
+        printf("%s  ", entries[i]->d_name);
+    }
+
+    printf("\n");
+
+error:
+    return;
 }
 
 /**
@@ -83,6 +109,42 @@ error:
 }
 
 /**
+ * Read and print the entries in the given path
+ *
+ * Args:
+ *      path = The path
+ *      a = -a command line option, whether or not to skip dot entries
+ *
+ * Returns:
+ *      The number of read entries
+ */
+
+int read_print_path(const char* path, bool a)
+{
+    struct dirent** entries = NULL;
+    int (*filter_fn)(const struct dirent*) = NULL;
+    int rc = 0;
+
+    filter_fn = a ? NULL : filter_dot;
+
+    rc = scandir(path, &entries, filter_fn, sort_nocase);
+    check(rc >= 0, "Unable to open directory: %s", path);
+    check(entries, "Entries are null in directory: %s", path);
+    print_entries(rc, entries);
+    free_entries(rc, entries);
+
+    return rc;
+
+error:
+    if(rc > 0 && entries)
+    {
+        free_entries(rc, entries);
+    }
+
+    return -1;
+}
+
+/**
  * Read the command line options from argv
  * Write command line options into the output arguments
  *
@@ -113,33 +175,35 @@ void read_opts(int argc, char* argv[], bool* a)
 
 int main(int argc, char* argv[])
 {
-    struct dirent** entries = NULL;
-    int (*filter_fn)(const struct dirent*) = NULL;
     int rc = 0;
     int i = 0;
     bool a = false;
 
     read_opts(argc, argv, &a);
-    filter_fn = a ? NULL : filter_dot;
 
-    rc = scandir(DEFAULT_PATH, &entries, filter_fn, sort_nocase);
-    check(rc >= 0, "Unable to open directory: %s", DEFAULT_PATH);
-
-    for(i = 0; i < rc; i++)
+    if(argc == 1 || optind >= argc)
     {
-        printf("%s  ", entries[i]->d_name);
+        rc = read_print_path(DEFAULT_PATH, a);
+        check(rc >= 0, "Unable to open path: %s", DEFAULT_PATH);
     }
-
-    printf("\n");
-    free_entries(rc, entries);
+    else if(argc == 2 || (argc == 3 && optind == 2))
+    {
+        rc = read_print_path(argv[optind], a);
+        check(rc >= 0, "Unable to open path: %s", argv[optind]);
+    }
+    else
+    {
+        for(i = optind; i < argc; i++)
+        {
+            printf("%s:\n", argv[i]);
+            rc = read_print_path(argv[i], a);
+            check(rc >= 0, "Unable to open path: %s", argv[i]);
+            printf("\n");
+        }
+    }
 
     return 0;
 
 error:
-    if(rc > 0 && entries)
-    {
-        free_entries(rc, entries);
-    }
-
     return 1;
 }

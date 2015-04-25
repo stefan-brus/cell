@@ -27,7 +27,7 @@ const char* DEFAULT_PATH = ".";
  *      entries = The entries
  */
 
-void free_entries(int count, struct dirent** entries)
+static void free_entries(int count, struct dirent** entries)
 {
     int i = 0;
 
@@ -47,7 +47,7 @@ void free_entries(int count, struct dirent** entries)
  *      entries = The entries
  */
 
-void print_entries(int count, struct dirent** entries)
+static void print_entries(int count, struct dirent** entries)
 {
     int i = 0;
 
@@ -75,7 +75,7 @@ error:
  *      0 if entry begins with a dot, 1 otherwise
  */
 
-int filter_dot(const struct dirent* entry)
+static int filter_dot(const struct dirent* entry)
 {
     check(entry, "Cannot filter null entry");
 
@@ -97,7 +97,7 @@ error:
  *      compare result
  */
 
-int sort_nocase(const struct dirent** e1, const struct dirent** e2)
+static int sort_nocase(const struct dirent** e1, const struct dirent** e2)
 {
     check(e1 && *e1, "First compare entry is null");
     check(e2 && *e2, "Second compare entry is null");
@@ -119,7 +119,7 @@ error:
  *      The number of read entries
  */
 
-int read_print_path(const char* path, bool a)
+static int read_print_path(const char* path, bool a)
 {
     struct dirent** entries = NULL;
     int (*filter_fn)(const struct dirent*) = NULL;
@@ -156,7 +156,7 @@ error:
  * TODO: Generalize and make this a vararg function
  */
 
-void read_opts(int argc, char* argv[], bool* a)
+static void read_opts(int argc, char* argv[], bool* a)
 {
     int opt = 0;
 

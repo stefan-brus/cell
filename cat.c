@@ -15,7 +15,7 @@
  *      lines = Whether or not to print line numbers
  */
 
-void echo(FILE* f, bool lines)
+static void echo(FILE* f, bool lines)
 {
     int c = 0;
     int line = 1;
@@ -56,7 +56,7 @@ error:
  * TODO: Generalize and make this a vararg function
  */
 
-void read_opts(int argc, char* argv[], bool* n)
+static void read_opts(int argc, char* argv[], bool* n)
 {
     int opt = 0;
 

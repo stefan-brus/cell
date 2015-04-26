@@ -17,7 +17,7 @@
  * Default path to open as a directory
  */
 
-const char* DEFAULT_PATH = ".";
+static const char* DEFAULT_PATH = ".";
 
 /**
  * Free the given directory entries

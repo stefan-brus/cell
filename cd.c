@@ -15,13 +15,13 @@
  * Default directory to switch to if no argument is given
  */
 
-const char* DEFAULT_DIR = "/home/stefan";
+static const char* DEFAULT_PATH = "/home/stefan";
 
 /**
  * Size of buffer to store current dir name in
  */
 
-const size_t CD_BUF_SIZE = 4096;
+static const size_t CD_BUF_SIZE = 4096;
 
 /**
  * Print the usage of this command
@@ -31,7 +31,7 @@ static void print_usage()
 {
     printf("USAGE:\n");
     printf("cd [PATH]\n");
-    printf("If no PATH is given, the target dir will be %s\n", DEFAULT_DIR);
+    printf("If no PATH is given, the target dir will be %s\n", DEFAULT_PATH);
 }
 
 int main(int argc, char* argv[])
@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
     switch(argc)
     {
         case 1:
-            path = (char*)DEFAULT_DIR;
+            path = DEFAULT_PATH;
             break;
         case 2:
             path = argv[1];
